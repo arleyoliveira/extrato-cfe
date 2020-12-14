@@ -1,6 +1,7 @@
 {
   "name": "arleyoliveira/extrato-cfe",
   "description": "Cria extrato da CF-e",
+  "license": "GNU GPL",
   "authors": [
     {
       "name": "Arley Oliveira",
@@ -8,6 +9,7 @@
     }
   ],
   "require": {
+    "dompdf/dompdf": "^0.8.6"
   },
   "autoload": {
     "psr-4": {
