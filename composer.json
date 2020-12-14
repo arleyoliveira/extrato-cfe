@@ -1,7 +1,7 @@
 {
   "name": "arleyoliveira/extrato-cfe",
   "description": "Cria extrato da CF-e",
-  "license": "GNU GPL",
+  "license": ["GNU Affero General Public License v3.0 or later"],
   "authors": [
     {
       "name": "Arley Oliveira",
