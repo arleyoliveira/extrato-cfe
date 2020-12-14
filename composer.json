@@ -1,0 +1,17 @@
+{
+  "name": "arleyoliveira/extrato-cfe",
+  "description": "Cria extrato da CF-e",
+  "authors": [
+    {
+      "name": "Arley Oliveira",
+      "email": "arley.msn@hotmail.com"
+    }
+  ],
+  "require": {
+  },
+  "autoload": {
+    "psr-4": {
+      "ArleyOliveira\\": "src"
+    }
+  }
+}
