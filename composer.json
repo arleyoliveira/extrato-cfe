@@ -1,16 +1,17 @@
 {
   "name": "arleyoliveira/extrato-cfe",
   "description": "Cria extrato da CF-e para exportar em PDF e HTML",
-  "license": ["GNU Affero General Public License v3.0 or later"],
   "authors": [
     {
-      "name": "Arley Oliveira",
-      "email": "arley.msn@hotmail.com"
+      "name": "arley",
+      "email": "arley.msn@hotmail.com.com"
     }
   ],
   "require": {
+    "php": ">= 7.0",
     "dompdf/dompdf": "^0.8.6",
-    "tecnickcom/tc-lib-barcode": "^1.15"
+    "tecnickcom/tc-lib-barcode": "^1.15",
+    "twig/twig": "^2.0"
   },
   "autoload": {
     "psr-4": {
