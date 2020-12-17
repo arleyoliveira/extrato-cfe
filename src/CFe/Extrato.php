@@ -9,14 +9,18 @@ use ArleyOliveira\Utils\Mask;
 
 class Extrato
 {
+    /**
+     * @var \SimpleXMLElement|string
+     */
     protected $xml;
 
+    /**
+     * @var string
+     */
     protected $logo;
 
-    protected $emitente;
-
     /**
-     * @var
+     * @var string
      */
     protected $infoConsultaAplicativo;
 
@@ -113,8 +117,6 @@ class Extrato
         $std->informacao = $this->xml->infCFe->infAdic;
 
         $std->infoConsultaAplicativo = $this->infoConsultaAplicativo;
-
-        /*var_dump($std->pagamentos); die;*/
 
         $twig = new Twig();
 
