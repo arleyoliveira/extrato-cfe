@@ -61,7 +61,7 @@ class Extrato
         $std->logo = $this->logo;
         $std->emitente = $this->xml->infCFe->emit;
 
-        $std->emitente->CNPJ = Mask::mask($std->emitente->CNPJ, "##.###.###/####-##");
+        $std->emitente->CNPJ = Mask::mask((string)$std->emitente->CNPJ, "##.###.###/####-##");
         $std->emitente->enderEmit->CEP = vsprintf("%s%s%s%s%s-%s%s%s", str_split($std->emitente->enderEmit->CEP));
 
         $std->ide = $this->xml->infCFe->ide;
