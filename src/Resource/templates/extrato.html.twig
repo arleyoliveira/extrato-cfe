@@ -6,19 +6,17 @@
         body {
             font-size: 7pt;
             font-family: Arial, Helvetica, sans-serif;
-            margin: 0 auto;
-           /* margin-left: -40px;*/
+            margin-left: -40px;
             margin-top: -10px;
             width: 300px; /* Valor da Largura */
         }
 
-        div.conteudo {
-            align-content: center;
-        }
-
-
         .text-center {
             text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
         }
 
         .font-bold {
@@ -41,6 +39,10 @@
 
         hr {
             margin-top: -3px;
+        }
+
+        td.nome-produto {
+            width: 100px;
         }
 
     </style>
@@ -89,22 +91,199 @@
     CUPOM FISCAL ELETRÔNICO - SAT
 </p>
 
-<hr>
+{% if destinatario is defined and destinatario.identificaoCliente is defined %}
+    <hr>
+    <p>CPF/CNPJ do consumidor: {{ destinatario.identificaoCliente }}</p>
+{% endif %}
 
+<hr>
 <p class="font-bold">
-    # | COD | DESC | QTD | UN | VL.UNIT (R$) | ST | ALIQ | VL.ITEM (R$)
+    # | COD | DESC | QTD | UN | VL.UNIT(R$) | VL.TR(R$) | VL.ITEM(R$)
 </p>
 
 <hr>
 
+{% set valorDescontoISSQN = 0 %}
+{% set valorAcrescimoISSQN = 0 %}
 
+<table class="tabela-produtos">
+
+    <tbody>
+    {% for item in produtos %}
+        <tr class="item">
+            <td>
+                {{ "%03d"| format(loop.index) }}
+            </td>
+            <td>
+                {{ item.prod.cProd }}
+            </td>
+            <td class="nome-produto">
+                {{ item.prod.xProd }}
+            </td>
+            <td>
+                {{ item.prod.qCom | number_format(4, ',', '.') }} {{ item.prod.uCom }} X
+            </td>
+            <td>
+                {{ item.prod.vUnCom | number_format(2, ',', '.') }}
+            </td>
+            <td>
+                ({{ item.imposto.vItem12741 | number_format(2, ',', '.') }})
+            </td>
+            <td class="text-right">
+                {{ item.prod.vProd | number_format(2, ',', '.') }}
+            </td>
+        </tr>
+
+        {% if item.prod.vDesc > 0 %}
+            <tr class="desconto-item">
+                <td colspan="4">desconto sobre o item</td>
+                <td class="text-right" colspan="3">- {{ item.prod.vDesc | number_format(2, ',', '.') }}</td>
+            </tr>
+        {% endif %}
+
+        {% if item.prod.vOutro > 0 %}
+            <tr class="acrescimo-item">
+                <td colspan="4">acréscimo sobre o item</td>
+                <td class="text-right" colspan="3">+ {{ item.prod.vOutro | number_format(2, ',', '.') }}</td>
+            </tr>
+        {% endif %}
+
+        {% if item.prod.vRatDesc > 0 %}
+            <tr class="desconto-item">
+                <td colspan="4">rateio de desconto sobre subtotal</td>
+                <td class="text-right" colspan="3">- {{ item.prod.vRatDesc | number_format(2, ',', '.') }}</td>
+            </tr>
+        {% endif %}
+
+
+        {% if item.prod.vRatAcr > 0 %}
+            <tr class="acrescimo-item">
+                <td colspan="4">rateio de acréscimo sobre subtotal</td>
+                <td class="text-right" colspan="3"> + {{ item.prod.vRatAcr | number_format(2, ',', '.') }}</td>
+            </tr>
+        {% endif %}
+
+        {% if item.imposto.ISSQN is defined %}
+
+            <tr class="vdeducissqn-item">
+                <td colspan="4">dedução para ISSQN</td>
+                <td class="text-right" colspan="3">
+                    - {{ item.imposto.ISSQN.vDeducISSQN | number_format(2, ',', '.') }}</td>
+            </tr>
+
+            <tr class="vbc-item">
+                <td colspan="4">base de cálculo ISSQN</td>
+                <td class="text-right" colspan="3"> {{ item.imposto.ISSQN.vBC | number_format(2, ',', '.') }}</td>
+            </tr>
+
+            {% set valorDescontoISSQN = valorDescontoISSQN + item.prod.vDesc %}
+            {% set valorAcrescimoISSQN = valorAcrescimoISSQN + item.prod.vOutro %}
+
+        {% endif %}
+
+    {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+<table style="width: 100%">
+    <tr>
+        <td>Total bruto de itens (R$)</td>
+        <td class="text-right">{{ total.ICMSTot.vProd | number_format(2, ',', '.') }}</td>
+    </tr>
+
+    {% set incidenteDescAcres = (valorDescontoISSQN + total.ICMSTot.vDesc) - (valorAcrescimoISSQN + total.ICMSTot.vOutro ) %}
+    <tr>
+        <td>Total de descontos/acréscimo sobre total</td>
+        <td class="text-right">{{ (incidenteDescAcres > 0) ? '-' : '+' }} {{ incidenteDescAcres | number_format(2, ',', '.') }}</td>
+    </tr>
+
+    {% if total.ICMSTot.DescAcrEntr is defined %}
+        {% if total.ICMSTot.DescAcrEntr.vDescSubtot %}
+            <tr>
+                <td>Desconto sobre subtotal</td>
+                <td class="text-right"> - {{ total.ICMSTot.DescAcrEntr.vDescSubtot | number_format(2, ',', '.') }} </td>
+            </tr>
+        {% endif %}
+
+        {% if total.ICMSTot.DescAcrEntr.vDescSubtot %}
+            <tr>
+                <td>Acréscimo sobre subtotal</td>
+                <td class="text-right">
+                    + {{ total.ICMSTot.DescAcrEntr.vAcresSubtot | number_format(2, ',', '.') }} </td>
+            </tr>
+        {% endif %}
+    {% endif %}
+
+    <tr>
+        <td class="font-bold">TOTAL R$</td>
+        <td class="font-bold text-right">{{ total.vCFe | number_format(2, ',', '.') }}</td>
+    </tr>
+
+</table>
+
+<br>
+
+<table style="width: 100%">
+    <tbody>
+    {% for pgto in pagamentos %}
+        <tr>
+            <td class="">{{ pgto.cMP | pagamento }}</td>
+            <td class="text-right">{{ pgto.vMP | number_format(2, ',', '.') }}</td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td class="">Troco</td>
+        <td class="text-right">{{ vTroco | number_format(2, ',', '.') }}</td>
+    </tr>
+    </tbody>
+</table>
+
+{% if informacao.obsFisco is defined and informacao.obsFisco.xTexto %}
+    <p>{{ informacao.obsFisco.xTexto }}</p>
+{% endif %}
+
+<hr>
+
+{% if informacao.infCpl %}
+    <p>OBSERVAÇÕES DO CONTRIBUINTE</p>
+    <p>{{ informacao.infCpl }}</p>
+{% endif %}
+
+{% if total.vCFeLei12741 > 0 %}
+    <table style="width: 100%">
+        <tr>
+            <td class="">Valor aproximado dos tributos deste cupom (Conforme Lei Fed. 12.741/2012)</td>
+            <td class="text-right">R${{ total.vCFeLei12741 | number_format(2, ',', '.') }}</td>
+        </tr>
+    </table>
+{% endif %}
+
+<br/>
+<hr>
+
+<p class="text-center font-size-8">
+    SAT No. <b>{{ ide.nCFe }}</b> <br/>
+    {{ emitidaEm | date('d/m/Y - H:i:s') }}
+</p>
 
 <p class="text-center">
-    {{ chave | barcode | raw }}
+    {{ chave | chave_mask }}
 </p>
+<div class="text-center" style="margin-left: 10px">
+    {{ chave | barcode128 | raw }}
+</div>
 
-{% for prod in produtos %}
-    <p>{{ prod.xProd }}</p>
-{% endfor %}
+<div class="" style="margin-left: 40px">
+    {{ qrCode | qrcode | raw }}
+</div>
+
+{% if infoConsultaAplicativo  %}
+    <p class="text-center font-bold">
+        {{ infoConsultaAplicativo }}
+    </p>
+{% endif %}
+
 </body>
 </html>

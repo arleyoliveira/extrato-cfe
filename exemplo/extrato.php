@@ -5,6 +5,10 @@ $xml = __DIR__ . '/../docs/cfe.xml';
 
 $logo = __DIR__ . '/../docs/logo.jpg';
 
-$obj = new \ArleyOliveira\CFe\Extrato($xml, $logo);
 
-echo $obj->render();
+$infoConsultaAplicativo = "Consulte o QR Code pelo aplicativo \"De olho na nota\", disponível na AppStore(Apple) e PlayStore(Android)";
+
+$obj = new \ArleyOliveira\CFe\Extrato($xml, $logo, $infoConsultaAplicativo);
+
+echo $obj->showPDF();
+
