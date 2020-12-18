@@ -19,5 +19,6 @@
     "psr-4": {
       "ArleyOliveira\\": "src"
     }
-  }
+  },
+  "minimum-stability": "stable"
 }
