@@ -10,5 +10,9 @@ $infoConsultaAplicativo = "Consulte o QR Code pelo aplicativo \"De olho na nota\
 
 $obj = new \ArleyOliveira\CFe\Extrato($xml, $logo, $infoConsultaAplicativo);
 
-echo $obj->showPDF();
+$pdf = $obj->pdf();
+
+header('Content-Type: application/pdf');
+header('Content-Disposition: inline; filename="extrato.pdf"');
+echo $pdf;
 

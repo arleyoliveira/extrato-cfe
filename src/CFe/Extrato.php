@@ -24,6 +24,11 @@ class Extrato
      */
     protected $infoConsultaAplicativo;
 
+    /**
+     * @var string
+     */
+    protected $content;
+
 
     /**
      * Extrato constructor.
@@ -44,6 +49,8 @@ class Extrato
         }
 
         $this->infoConsultaAplicativo = $infoConsultaAplicativo;
+
+        $this->render();
     }
 
 
@@ -55,7 +62,6 @@ class Extrato
      */
     private function make()
     {
-
         $attr = '@attributes';
         $std = new \stdClass();
         $std->logo = $this->logo;
@@ -79,7 +85,6 @@ class Extrato
         if ($this->xml->infCFe->dest) {
             $std->destinatario = $this->xml->infCFe->dest;
             $adquirente = isset($std->destinatario->CNPJ) ? (string)$std->destinatario->CNPJ : (string)$std->destinatario->CPF;
-
 
             if (strlen($adquirente) == 11) {
                 $std->destinatario->identificaoCliente = Mask::mask($adquirente, "###.###.###-##");
@@ -116,6 +121,10 @@ class Extrato
 
         $std->informacao = $this->xml->infCFe->infAdic;
 
+        if (isset($this->xml->infCFe->entrega)) {
+            $std->entrega = $this->xml->infCFe->entrega;
+        }
+
         $std->infoConsultaAplicativo = $this->infoConsultaAplicativo;
 
         $twig = new Twig();
@@ -123,18 +132,31 @@ class Extrato
         return $twig->render('extrato.html.twig', (array)$std);
     }
 
-    public function render()
+    /**
+     * @return string
+     */
+    private function render()
     {
-        return $this->make();
+        $this->content = $this->make();
     }
 
-    public function showPDF()
+    /**
+     * @return string
+     */
+    public function html()
     {
-        $conteudo = $this->render();
+        return $this->content;
+    }
 
+    /**
+     * @param false $download
+     * @return string|null
+     */
+    public function pdf($download = false)
+    {
         // instantiate and use the dompdf class
         $dompdf = new Dompdf();
-        $dompdf->loadHtml($conteudo);
+        $dompdf->loadHtml($this->content);
 
         // (Optional) Setup the paper size and orientation
         $dompdf->setPaper([0, 0, 235.00, 841.89], 'portrait');
@@ -142,9 +164,12 @@ class Extrato
         // Render the HTML as PDF
         $dompdf->render();
 
-        $chave = (string)$this->xml->infCFe->attributes()["Id"];
-        // Output the generated PDF to Browser
-        $dompdf->stream($chave);
+        if ($download) {
+            // Output the generated PDF to Browser
+            $chave = (string)$this->xml->infCFe->attributes()["Id"];
+            $dompdf->stream($chave);
+        }
+        return $dompdf->output();
     }
 
 }

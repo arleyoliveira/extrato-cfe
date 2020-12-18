@@ -4,6 +4,7 @@ namespace ArleyOliveira\Common;
 
 use ArleyOliveira\Utils\Types;
 use ArleyOliveira\Utils\Mask;
+use ArleyOliveira\Utils\Estado;
 
 class Twig
 {
@@ -37,18 +38,18 @@ class Twig
         $this->twig->addFilter($filter);
 
 
-         $filter = new \Twig\TwigFilter('barcode128', function ($string) {
-             $barcode = new \Com\Tecnick\Barcode\Barcode();
-             $bobj = $barcode->getBarcodeObj(
-                 'C128C',                     // barcode type and additional comma-separated parameters
-                 $string,          // data string to encode
-                 -1,                             // bar width (use absolute or negative value as multiplication factor)
-                 -30,                             // bar height (use absolute or negative value as multiplication factor)
-                 'black',                        // foreground color
-                 array(0, 0, 0, 0)           // padding (use absolute or negative values as multiplication factors)
-             )->setBackgroundColor('white'); // background color
-             return $bobj->getHtmlDiv();
-         });
+        $filter = new \Twig\TwigFilter('barcode128', function ($string) {
+            $barcode = new \Com\Tecnick\Barcode\Barcode();
+            $bobj = $barcode->getBarcodeObj(
+                'C128C',                     // barcode type and additional comma-separated parameters
+                $string,          // data string to encode
+                -1,                             // bar width (use absolute or negative value as multiplication factor)
+                -30,                             // bar height (use absolute or negative value as multiplication factor)
+                'black',                        // foreground color
+                array(0, 0, 0, 0)           // padding (use absolute or negative values as multiplication factors)
+            )->setBackgroundColor('white'); // background color
+            return $bobj->getHtmlDiv();
+        });
         $this->twig->addFilter($filter);
 
         $filter = new \Twig\TwigFilter('pagamento', function ($pagamento) {
@@ -57,13 +58,15 @@ class Twig
         });
         $this->twig->addFilter($filter);
 
-
         $filter = new \Twig\TwigFilter('chave_mask', function ($chave) {
             return Mask::mask($chave, "####-####-####-####-####-####-####-####-####-####-####");
         });
         $this->twig->addFilter($filter);
 
-
+        $filter = new \Twig\TwigFilter('uf_por_codigo', function ($codigoUF) {
+            return Estado::ESTADOS[(int)$codigoUF]['sigla'];
+        });
+        $this->twig->addFilter($filter);
     }
 
     /**

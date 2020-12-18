@@ -8,7 +8,11 @@
             font-family: Arial, Helvetica, sans-serif;
             margin-left: -40px;
             margin-top: -10px;
-            width: 300px; /* Valor da Largura */
+            width: 300px;
+        }
+
+        table {
+            width: 100%;
         }
 
         .text-center {
@@ -28,9 +32,14 @@
             height: 64px;
         }
 
-        p.nome-emitente {
+        p.nome-fantasia-emitente {
             font-size: 10pt;
             font-weight: bold;
+        }
+
+        p.nome-emitente {
+            font-size: 8pt;
+            text-transform: uppercase;
         }
 
         .font-size-8 {
@@ -50,19 +59,24 @@
 <body>
 
 
-<table class="cabecalho">
+<table>
     <tr>
         {% if logo %}
-            <td>
+            <td class="text-center">
                 <img src="{{ logo }}" class="logo"/>
             </td>
         {% endif %}
 
         <td colspan="{{ (logo) ? 1 : 2 }}">
+            {% if emitente.xFant is defined %}
+                <p class="nome-fantasia-emitente">{{ emitente.xFant }}</p>
+            {% endif %}
             <p class="nome-emitente">{{ emitente.xNome }}</p>
-            <p class="">
-                {{ emitente.enderEmit.xLgr }}, {{ emitente.enderEmit.nro }} - {{ emitente.enderEmit.xBairro }},
-                {{ emitente.enderEmit.xMun }}
+            <p>
+                {{ emitente.enderEmit.xLgr }}
+                , {{ emitente.enderEmit.nro }} {{ (emitente.enderEmit.xCpl is defined ? emitente.enderEmit.xCpl : '') }}
+                - {{ emitente.enderEmit.xBairro }},
+                {{ emitente.enderEmit.xMun }} - {{ ide.cUF | uf_por_codigo }}
             </p>
             <p class="">
                 CEP: {{ emitente.enderEmit.CEP }}
@@ -70,7 +84,7 @@
         </td>
     </tr>
 </table>
-<table class="info-emitente">
+<table>
     <tr>
         <td>
             CNPJ: {{ emitente.CNPJ }}
@@ -106,7 +120,7 @@
 {% set valorDescontoISSQN = 0 %}
 {% set valorAcrescimoISSQN = 0 %}
 
-<table class="tabela-produtos">
+<table>
 
     <tbody>
     {% for item in produtos %}
@@ -187,7 +201,7 @@
 
 <hr>
 
-<table style="width: 100%">
+<table>
     <tr>
         <td>Total bruto de itens (R$)</td>
         <td class="text-right">{{ total.ICMSTot.vProd | number_format(2, ',', '.') }}</td>
@@ -225,7 +239,7 @@
 
 <br>
 
-<table style="width: 100%">
+<table>
     <tbody>
     {% for pgto in pagamentos %}
         <tr>
@@ -244,6 +258,15 @@
     <p>{{ informacao.obsFisco.xTexto }}</p>
 {% endif %}
 
+{% if entrega is defined %}
+    <hr>
+    <p>DADOS PARA ENTREGA</p>
+    <p>
+        Endereço: {{ entrega.xLgr }}, {{ entrega.nro }} {{ (entrega.xCpl is defined ? entrega.xCpl : '') }}
+        - {{ entrega.xBairro }},
+        {{ entrega.xMun }} - {{ entrega.UF }}
+    </p>
+{% endif %}
 <hr>
 
 {% if informacao.infCpl %}
@@ -279,7 +302,7 @@
     {{ qrCode | qrcode | raw }}
 </div>
 
-{% if infoConsultaAplicativo  %}
+{% if infoConsultaAplicativo %}
     <p class="text-center font-bold">
         {{ infoConsultaAplicativo }}
     </p>
