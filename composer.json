@@ -1,6 +1,8 @@
 {
   "name": "arleyoliveira/extrato-cfe",
   "description": "Cria extrato da CF-e para exportar em PDF e HTML",
+  "homepage": "https://github.com/ArleyOliveira/extrato-cfe",
+  "license": ["LGPL-3.0-or-later+", "GPL-3.0-or-later", "MIT"],
   "authors": [
     {
       "name": "arley",
