@@ -71,6 +71,7 @@ class Extrato
         $std->emitente->enderEmit->CEP = vsprintf("%s%s%s%s%s-%s%s%s", str_split($std->emitente->enderEmit->CEP));
 
         $std->ide = $this->xml->infCFe->ide;
+        $std->ide->nserieSAT = Mask::mask((string)$std->ide->nserieSAT, "###.###.###");
 
         $std->total = $this->xml->infCFe->total;
 
